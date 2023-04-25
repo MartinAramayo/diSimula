@@ -25,37 +25,37 @@ if __name__ == '__main__':
     trajectory = arguments['<trajectory>']
     trajectory_func = locals()[trajectory]
 
-    physics = load_yaml("initial_cond.yml")
-    initial_cond = physics['physics'][trajectory]
-    r_vector = trajectory_func(**initial_cond)
-    dt = initial_cond['dt']
+    physics = load_yaml("params.yml")
+    params = physics['physics'][trajectory]
+    r_vector = trajectory_func(**params)
+    dt = params['dt']
 
     # For some reason the derivative is not well scaled
     v_vector = d_dt(r_vector) * 1 / dt # why? 
     a_vector = d_dt(v_vector) * 1 / dt # why?
 
     # Set up the plot
-    params = load_yaml("params.yml")
-    plt.style.use(params['style_args']) # set plot style
+    config = load_yaml("config.yml")
+    plt.style.use(config['style_args']) # set plot style
     fig, ax = plt.subplots(tight_layout=True)
-    aux = set_plot(ax, r_vector, v_vector, a_vector, params)
+    aux = set_plot(ax, r_vector, v_vector, a_vector, config)
     line, point, vel, acc = aux
-    data_bound_box(ax, r_vector, params)
-    add_legend(fig, ax, params)
+    data_bound_box(ax, r_vector, config)
+    add_legend(fig, ax, config)
 
     # run animation
     v_norm, a_norm = norm(v_vector), norm(a_vector)
-    skip = skip_step_change(dt, 1 / params['frames'])
+    skip = skip_step_change(dt, 1 / config['frames'])
     animate = partial(
         animate_physics, line=line, point=point, 
         vel=vel, acc=acc, r_vector=r_vector, 
-        skip=skip, ERROR=params['ERROR'],
+        skip=skip, ERROR=config['ERROR'],
         v_vector=v_vector, v_norm=v_norm, 
         a_vector=a_vector, a_norm=a_norm
     )
 
     # save animation
-    interval = 100 / params['frames'] # frame duration (ms)
+    interval = 100 / config['frames'] # frame duration (ms)
     frames = len(r_vector[::skip]) # number of frames
-    ani = ani_object(skip, fig, animate, frames, interval, params)
-    ani2video(ani, arguments['<filename>'], params)
+    ani = ani_object(skip, fig, animate, frames, interval, config)
+    ani2video(ani, arguments['<filename>'], config)

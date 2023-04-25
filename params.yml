@@ -1,34 +1,28 @@
-spacing: 0.05 # espacio entre la trayectoria y los ejes
-frames: 30 # cuantos FPS la animacion
-vel_color: "#34BE9D"
-acc_color: "#BE3455"
-ERROR: 0.0000001 # Epsilon de la simulacion (abajo de esto considero todo cero)
-style_args: 
-  axes.labelsize: 18
-  axes.spines.right: false
-  axes.spines.top: false
-  axes.titlesize: 15
-  font.family: serif
-  font.size: 12
-  legend.fontsize: 12
-  pgf.rcfonts: false
-  text.usetex: true
-  xtick.bottom: true
-  xtick.color: black
-  xtick.labelsize: 15
-  ytick.color: black
-  ytick.labelsize: 15
-  ytick.left: true
-line_plot_args:
-  lw: 0.5
-  linestyle: 'dashed'
-  color: 'black'
-scatter_args:
-  s: 100
-  color: 'white' 
-  edgecolors: 'black' 
-vector_plot_args:
-  headaxislength: 2
-  headlength: 2
-  headwidth: 3
-  alpha: 0.9
+physics: 
+  parabolic_trajectory: 
+    x0: 0.0
+    y0: 0.0
+    v0: 15.0
+    angle: 45.0
+    g: 9.81
+    dt: 0.001
+  MRU: 
+    x0: 0.0
+    y0: 0.0
+    v0: 15.0
+    angle: 45.0
+    dt: 0.001
+    t_max: 4
+  olita: 
+    x0: 0.0
+    y0: 0.0
+    omega1: 9
+    alpha: 2.356194490192345
+    omega2: 3
+    dt: 0.001
+    t_max: 5
+  kokoro: 
+    x0: 0.0
+    y0: 0.0
+    dt: 0.001
+    t_max: 15

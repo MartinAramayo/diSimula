@@ -52,7 +52,13 @@ def kokoro(x0, y0, dt, t_max):
 
     # Calculate x and y positions
     x = x0 + 16 * np.sin(t)**3
-    y = y0 + 13 * np.cos(t) - 5 * np.cos(2*t) - 2 * np.cos(3*t) - np.cos(4*t)
+    y = (
+        y0 
+        + 13 * np.cos(t) 
+        - 5 * np.cos(2*t) 
+        - 2 * np.cos(3*t) 
+        - np.cos(4*t)
+    )
     r_vector = np.asarray((x, y)).T
 
     return r_vector

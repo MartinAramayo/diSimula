@@ -30,8 +30,8 @@ def load_yaml(filename):
 
     with open(filename, "r") as stream:
         try:
-            params = yaml.safe_load(stream)
-            return params
+            file_dict = yaml.safe_load(stream)
+            return file_dict
         except yaml.YAMLError as exc:
             print(exc)
 
@@ -42,28 +42,28 @@ def colormapL(color):
     )
     return output
 
-def set_plot(ax, r_vector, v_vector, a_vector, params):
+def set_plot(ax, r_vector, v_vector, a_vector, config):
     
     r_0, v_0, a_0 = r_vector[0], v_vector[0], a_vector[0]
     
-    line, = ax.plot(*r_0,**params['line_plot_args'])
-    point = ax.scatter(*r_0, **params['scatter_args'])
+    line, = ax.plot(*r_0,**config['line_plot_args'])
+    point = ax.scatter(*r_0, **config['scatter_args'])
 
     # initial conditions
     pick = (lambda x, e: x if x > e else e)
-    v0 = pick(norm1d(v_0), params['ERROR'])
-    a0 = pick(norm1d(a_0), params['ERROR'])
+    v0 = pick(norm1d(v_0), config['ERROR'])
+    a0 = pick(norm1d(a_0), config['ERROR'])
 
     # plot vectors
-    plot_args = params['vector_plot_args']
-    cm_vel = colormapL(params['vel_color'])
-    cm_acc = colormapL(params['acc_color'])
+    plot_args = config['vector_plot_args']
+    cm_vel = colormapL(config['vel_color'])
+    cm_acc = colormapL(config['acc_color'])
     vel = ax.quiver(*r_0, *v_0, v0, cmap=cm_vel, **plot_args)
     acc = ax.quiver(*r_0, *a_0, a0, cmap=cm_acc, **plot_args)
 
     return line, point, vel, acc
 
-def data_bound_box(ax, r_vector, params):
+def data_bound_box(ax, r_vector, config):
 
     # set up plotbox to data
     r_max = r_vector.max(axis=0)
@@ -71,7 +71,7 @@ def data_bound_box(ax, r_vector, params):
     r_range = r_max - r_min
 
     # how much space to add to the range
-    spacing = params['spacing']
+    spacing = config['spacing']
     gap = r_range * spacing
 
     # get the new window range
@@ -103,16 +103,16 @@ def data_bound_box(ax, r_vector, params):
         ax.set_ylim(*get_interval(center_y, radius_x))
     ax.set_aspect('equal')
 
-def add_legend(fig, ax, params):
+def add_legend(fig, ax, config):
 
-    cm_vel = params['vel_color']
-    cm_acc = params['acc_color']
+    cm_vel = config['vel_color']
+    cm_acc = config['acc_color']
     vel_patch = Patch(color=cm_vel, label=r'$\vec{v}$')
     acc_patch = Patch(color=cm_acc, label=r'$\vec{a}$')
     ax.legend(handles=[vel_patch, acc_patch])
 
-    ax.set_xlabel('Coordenada $x$')
-    ax.set_ylabel('Coordenada $y$')
+    ax.set_xlabel(config['x_label'])
+    ax.set_ylabel(config['y_label'])
 
 def update_vector(quiv, position, norm, vector, index, ERROR):
 
@@ -143,7 +143,7 @@ def animate_physics(
 
     return line, vel, acc, 
 
-def ani_object(skip, fig, ani_func, frames, interval, params):
+def ani_object(skip, fig, ani_func, frames, interval, config):
     
     # Create the animation
     aux = {"frames": frames, "interval": interval}
@@ -151,9 +151,9 @@ def ani_object(skip, fig, ani_func, frames, interval, params):
 
     return ani
 
-def ani2video(ani, filename, params):
+def ani2video(ani, filename, config):
 
-    aux = {"fps": params['frames']}
+    aux = {"fps": config['frames']}
     if filename.endswith('.gif'):
         # to GIF
         ani.save(f'{filename}', writer='pillow', **aux)
