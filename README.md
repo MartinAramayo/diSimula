@@ -111,11 +111,16 @@ correr:
 python disimula.py MRU -o output/MRU.mp4
 ~~~
 
-# Requisitos
+## Requisitos
 
 Hace falta tener instalado, `python`, `matplotlib`, `numpy`, `docopt` y `pyyaml`. En el repo hay un archivo `req.txt` que contiene todos los módulos necesarios. Para guardar `mp4` es necesario tener instalado `ffmpeg`. Para poder graficar con el mismo estilo de este gráfico es necesario tener instalado $\LaTeX$. Para estar seguro podés instalar con el `requirements file` `req.txt` para tener la misma versión de los módulos que use.
 
-# Configuración y problemas conocidos
+### Instalar anaconda (Incluye python numpy y cosas para data science)
+
+Instalar anaconda
+[https://www.anaconda.com/download/](https://www.anaconda.com/download/)
+
+## Configuración y problemas conocidos
 
 Los gráficos que están en el repo se crearon con LaTeX activado. Si no lo tenés instalado el gráfico se vera diferente y hará falta cambiar el archivo de configuración para que funcione el código. **Si el programa no corre a la primera se debe cambiar el `config.yml` por este**:
 
@@ -159,8 +164,3 @@ vector_plot_args:
   headwidth: 3
   alpha: 0.9
 ~~~
-
-## Instalar anaconda (Incluye python numpy y cosas para data science)
-
-Instalar anaconda
-[https://www.anaconda.com/download/](https://www.anaconda.com/download/)
