@@ -13,9 +13,10 @@ Dentro del archivo `trajectories.py` crea los $x(t)$ e $y(t)$ de la trayectoria 
 
 Hay algunos ejemplos de trayectorias cargados, sus animaciones están en `output` dentro del repo. Los ejemplos subidos en el repo se pueden crear de la siguiente manera:
 
-~~~
-Crea un video a partir de una trayectoria definida
-como función de Python y las condiciones iniciales.
+~~~ bash
+Crea un video a partir de una/s trayectoria/s definida/s
+como función/es de Python. Incorpora traza y vectores velocidad
+y aceleración.
 
 Usage:
   disimula.py <trajectory> -o <filename>
@@ -48,9 +49,11 @@ def MRU(x0, y0, v0, angle, dt, t_max):
     # Calculate x and y positions
     x = x0 + v0 * np.cos(theta) * t
     y = y0 + v0 * np.sin(theta) * t
+
+    # packaging the array for the plotter
     r_vector = np.asarray((x, y)).T
 
-    return r_vector
+    return pack_object(r_vector)
 ~~~
 
 Podes usar funciones de [numpy](https://numpy.org/) como `np.cos`, `np.sin`, `np.tan`, etc.
@@ -99,9 +102,11 @@ def MRU(x0, y0, v0, angle, dt, t_max, t_0):
     # Calculate x and y positions
     x = x0 + v0 * np.cos(theta) * t
     y = y0 + v0 * np.sin(theta) * t
+
+    # packaging the array for the plotter
     r_vector = np.asarray((x, y)).T
 
-    return r_vector
+    return pack_object(r_vector)
 ~~~
 
 Para guardar la animación en el directorio `output` como un MP4 solo hace falta 
@@ -113,14 +118,16 @@ python disimula.py MRU -o output/MRU.mp4
 
 ## Requisitos
 
-Hace falta tener instalado, `python`, `matplotlib`, `numpy`, `docopt` y `pyyaml`. En el repo hay un archivo `req.txt` que contiene todos los módulos necesarios. Para guardar `mp4` es necesario tener instalado `ffmpeg`. Para poder graficar con el mismo estilo de este gráfico es necesario tener instalado $\LaTeX$. Para estar seguro podés instalar con el `requirements file` `req.txt` para tener la misma versión de los módulos que use.
+Hace falta tener instalado, `python`, `matplotlib`, `numpy`, `docopt` y `pyyaml`. En el repo hay un archivo `requirements.txt` que contiene todos los módulos necesarios. Para guardar `mp4` es necesario tener instalado `ffmpeg`. Para poder graficar con el mismo estilo de este gráfico es necesario tener instalado $\LaTeX$. Para estar seguro podés instalar con el `requirements file` `requirements.txt` para tener la misma versión de los módulos que use.
 
-### Instalar anaconda (Incluye python numpy y cosas para data science)
+### Instalar anaconda (Incluye Python NumPy y herramientas para Data Science)
 
 Instalar anaconda
 [https://www.anaconda.com/download/](https://www.anaconda.com/download/)
 
 ## Configuración y problemas conocidos
+
+### Error en LaTeX
 
 Los gráficos que están en el repo se crearon con LaTeX activado. Si no lo tenés instalado el gráfico se vera diferente y hará falta cambiar el archivo de configuración para que funcione el código. **Si el programa no corre a la primera se debe cambiar el `config.yml` por este**:
 

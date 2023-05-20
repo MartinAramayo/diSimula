@@ -1,5 +1,11 @@
 import numpy as np
 
+def pack_object(r_vector):
+    return np.asarray((r_vector,))
+
+def pack_object_multi(R_vector):
+    return np.asarray(tuple(R_vector,))
+
 def parabolic_trajectory(x0, y0, v0, angle, g, dt):
     
     # Convert angle to radians
@@ -14,9 +20,36 @@ def parabolic_trajectory(x0, y0, v0, angle, g, dt):
     # Calculate x and y positions
     x = x0 + v0 * np.cos(theta) * t
     y = y0 + v0 * np.sin(theta) * t - 0.5 * g * t**2
+
+    # packaging the array for the plotter
     r_vector = np.asarray((x, y)).T
 
-    return r_vector
+    return pack_object(r_vector)
+
+def parabolic_trajectory_multi(x0, y0, v0, angle, g, dt):
+    
+    R_vector = []
+    for n_object in range(72):
+
+        # Convert angle to radians
+        theta = np.radians(angle + 5 * n_object)
+        
+        # Calculate time of flight
+        t_max = 2 * v0 * np.sin(45) / g
+
+        # Create time array
+        t = np.arange(0, 2*t_max, dt)
+
+        # Calculate x and y positions
+        x = x0 + v0 * np.cos(theta) * t
+        y = y0 + v0 * np.sin(theta) * t - 0.5 * g * t**2
+
+        # packaging the array for the plotter
+        r_vector = np.asarray((x, y)).T
+
+        R_vector.append(r_vector)
+
+    return pack_object_multi(R_vector)
 
 def MRU(x0, y0, v0, angle, dt, t_max):
     
@@ -29,9 +62,11 @@ def MRU(x0, y0, v0, angle, dt, t_max):
     # Calculate x and y positions
     x = x0 + v0 * np.cos(theta) * t
     y = y0 + v0 * np.sin(theta) * t
+
+    # packaging the array for the plotter
     r_vector = np.asarray((x, y)).T
 
-    return r_vector
+    return pack_object(r_vector)
 
 def olita(x0, y0, omega1, alpha, omega2, dt, t_max):
 
@@ -41,9 +76,11 @@ def olita(x0, y0, omega1, alpha, omega2, dt, t_max):
     # Calculate x and y positions
     x = x0 + 10 * np.sin(omega1 * t + alpha)
     y = y0 + 10 * np.sin(omega2 * t) 
+
+    # packaging the array for the plotter
     r_vector = np.asarray((x, y)).T
 
-    return r_vector
+    return pack_object(r_vector)
 
 def kokoro(x0, y0, dt, t_max):
 
@@ -59,6 +96,8 @@ def kokoro(x0, y0, dt, t_max):
         - 2 * np.cos(3*t) 
         - np.cos(4*t)
     )
+
+    # packaging the array for the plotter
     r_vector = np.asarray((x, y)).T
 
-    return r_vector
+    return pack_object(r_vector)

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-"""Crea un video a partir de una trayectoria definida
-como función de Python y las condiciones iniciales.
+"""Crea un video a partir de una/s trayectoria/s definida/s
+como función/es de Python. Incorpora traza y vectores velocidad
+y aceleración.
 
 Usage:
   disimula.py <trajectory> -o <filename>
@@ -20,42 +21,45 @@ from docopt import docopt
 
 if __name__ == '__main__':
     
-    arguments = docopt(__doc__, version='Gofito 0.1')
+    arguments = docopt(__doc__, version='diSimula 1.0')
 
     trajectory = arguments['<trajectory>']
     trajectory_func = locals()[trajectory]
 
     physics = load_yaml("params.yml")
     params = physics['physics'][trajectory]
-    r_vector = trajectory_func(**params)
+    R_vector = trajectory_func(**params)
     dt = params['dt']
 
     # For some reason the derivative is not well scaled
-    v_vector = d_dt(r_vector) * 1 / dt # why? 
-    a_vector = d_dt(v_vector) * 1 / dt # why?
+    V_vector, A_vector = get_vel_acc_multi(R_vector, dt)
 
     # Set up the plot
     config = load_yaml("config.yml")
     plt.style.use(config['style_args']) # set plot style
+
+    # plot them all
     fig, ax = plt.subplots(tight_layout=True)
-    aux = set_plot(ax, r_vector, v_vector, a_vector, config)
-    line, point, vel, acc = aux
-    data_bound_box(ax, r_vector, config)
+    data_bound_box_multi(ax, R_vector, config)   
+    Line, Point, Vel, Acc = set_plot_multi(
+        ax, R_vector, V_vector, A_vector, config
+    )
+
     add_legend(fig, ax, config)
 
     # run animation
-    v_norm, a_norm = norm(v_vector), norm(a_vector)
     skip = skip_step_change(dt, 1 / config['frames'])
+    V_norm, A_norm = multi_norm(V_vector), multi_norm(A_vector)
     animate = partial(
-        animate_physics, line=line, point=point, 
-        vel=vel, acc=acc, r_vector=r_vector, 
+        animate_physics_multi, Line=Line, Point=Point, 
+        Vel=Vel, Acc=Acc, R_vector=R_vector, 
         skip=skip, ERROR=config['ERROR'],
-        v_vector=v_vector, v_norm=v_norm, 
-        a_vector=a_vector, a_norm=a_norm
+        V_vector=V_vector, V_norm=V_norm, 
+        A_vector=A_vector, A_norm=A_norm
     )
 
     # save animation
     interval = 100 / config['frames'] # frame duration (ms)
-    frames = len(r_vector[::skip]) # number of frames
+    frames = len(R_vector[0,::skip]) # number of frames
     ani = ani_object(skip, fig, animate, frames, interval, config)
     ani2video(ani, arguments['<filename>'], config)

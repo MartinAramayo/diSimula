@@ -8,11 +8,28 @@ from matplotlib.colors import LinearSegmentedColormap
 def norm(x):
     return np.linalg.norm(x, axis=1)
 
+def multi_norm(x):
+    return np.linalg.norm(x, axis=2)
+
 def norm1d(x):
     return np.linalg.norm(x, axis=0)
 
 def d_dt(x):
     return np.gradient(x, axis=0)
+
+def get_vel_acc_multi(R_vector, dt):
+    
+    # For some reason the derivative is not well scaled
+    V_vector = []
+    A_vector = []
+    for n_object in range(len(R_vector)):
+        r_vector = R_vector[n_object]
+        v_vector = d_dt(r_vector) * 1 / dt # why? 
+        a_vector = d_dt(v_vector) * 1 / dt # why?
+        V_vector.append(v_vector)
+        A_vector.append(a_vector)
+
+    return V_vector, A_vector
 
 def skip_step_change(step1, step2):
 
@@ -63,11 +80,44 @@ def set_plot(ax, r_vector, v_vector, a_vector, config):
 
     return line, point, vel, acc
 
+def set_plot_multi(ax, R_vector, V_vector, A_vector, config):
+    
+    Line, Point, Vel, Acc = [], [], [], []
+
+    for n_object in range(len(R_vector)):
+        r_vector, v_vector, a_vector = (
+            R_vector[n_object], 
+            V_vector[n_object], 
+            A_vector[n_object]
+        )
+        aux = set_plot(ax, r_vector, v_vector, a_vector, config)
+        line, point, vel, acc = aux
+
+        Line.append(line)
+        Point.append(point)
+        Vel.append(vel)
+        Acc.append(acc)
+    
+    return Line, Point, Vel, Acc
+
 def data_bound_box(ax, r_vector, config):
 
-    # set up plotbox to data
+    # set up plotbox to data, for one body
     r_max = r_vector.max(axis=0)
     r_min = r_vector.min(axis=0)
+
+    data_bound_box_from_ranges(ax, r_min, r_max, config)
+
+def data_bound_box_multi(ax, R_vector, config):
+
+    # set up plotbox to data for multiple bodies
+    r_min = R_vector.min(axis=0).min(axis=0)
+    r_max = R_vector.max(axis=0).max(axis=0)
+
+    data_bound_box_from_ranges(ax, r_min, r_max, config)
+
+def data_bound_box_from_ranges(ax, r_min, r_max, config):
+
     r_range = r_max - r_min
 
     # how much space to add to the range
@@ -142,6 +192,35 @@ def animate_physics(
     update_vector(acc, pos, a_norm, a_vector, j_1, ERROR)
 
     return line, vel, acc, 
+
+def animate_physics_multi(
+    i, Line, Point, Vel, Acc, R_vector, skip, ERROR,
+    V_vector, V_norm, A_vector, A_norm
+    ):
+
+    for n_object in range(len(R_vector)):
+
+        r_vector, v_vector, a_vector = (
+            R_vector[n_object], 
+            V_vector[n_object], 
+            A_vector[n_object]
+        )
+
+        v_norm, a_norm = (
+            V_norm[n_object], 
+            A_norm[n_object]
+        )
+        line, point, vel, acc = (
+            Line[n_object], Point[n_object], Vel[n_object], Acc[n_object]
+        )
+    
+        animate_physics(
+            i, line, point, vel, acc, 
+            r_vector, skip, ERROR,
+            v_vector, v_norm, a_vector, a_norm
+        )
+
+    return *Line, *Vel, *Acc, 
 
 def ani_object(skip, fig, ani_func, frames, interval, config):
     
