@@ -109,7 +109,7 @@ def MRU(x0, y0, v0, angle, dt, t_max, t_0):
     return pack_object(r_vector)
 ~~~
 
-Para guardar la animación en el directorio `output` como un MP4 solo hace falta 
+Para guardar la animación en el directorio `output` como un **MP4** solo hace falta 
 correr:
 
 ~~~ bash
@@ -118,7 +118,7 @@ python disimula.py MRU -o output/MRU.mp4
 
 ## Requisitos
 
-Hace falta tener instalado, `python`, `matplotlib`, `numpy`, `docopt` y `pyyaml`. En el repo hay un archivo `requirements.txt` que contiene todos los módulos necesarios. Para guardar `mp4` es necesario tener instalado `ffmpeg`. Para poder graficar con el mismo estilo de este gráfico es necesario tener instalado $\LaTeX$. Para estar seguro podés instalar con el `requirements file` `requirements.txt` para tener la misma versión de los módulos que use.
+Hace falta tener instalado, `python`, `matplotlib`, `numpy`, `docopt` y `pyyaml`. En el repo hay un archivo `requirements.txt` que contiene todos los módulos necesarios. Para guardar **MP4** es necesario tener instalado `ffmpeg`. Para poder graficar con el mismo estilo de este gráfico es necesario tener instalado $\LaTeX$. Para estar seguro podés instalar con el `requirements file` `requirements.txt` para tener la misma versión de los módulos que use.
 
 ### Instalar anaconda (Incluye Python NumPy y herramientas para Data Science)
 
@@ -133,14 +133,15 @@ Los gráficos que están en el repo se crearon con LaTeX activado. Si no lo ten�
 
 ~~~ yaml
 spacing: 0.05 # espacio entre la trayectoria y los ejes
-frames: 30 # cuantos FPS la animación
+# frames: 60 # cuantos FPS la animación
+frames: 33.3333 # cuantos FPS la animación gif
 vel_color: "#34BE9D"
 acc_color: "#BE3455"
 ERROR: 0.0000001 # Epsilon de la simulacion (abajo de esto considero todo cero)
-# x_label: 'Coordenada $x$' # Activar si tenes instalado LaTeX
-# y_label: 'Coordenada $y$' # Activar si tenes instalado LaTeX
-x_label: 'Coordenada x' # Activar si no tenes instalado LaTeX
-y_label: 'Coordenada y' # Activar si no tenes instalado LaTeX
+x_label: 'Coordenada $x$'
+y_label: 'Coordenada $y$'
+# x_label: 'Coordenada x' # Activar si no tenes instalado LaTeX
+# y_label: 'Coordenada y' # Activar si no tenes instalado LaTeX
 style_args: 
   axes.labelsize: 18
   axes.spines.right: false
@@ -149,8 +150,8 @@ style_args:
   font.family: serif
   font.size: 12
   legend.fontsize: 12
-  # pgf.rcfonts: false # desactivar si no tenes instalado LaTeX
-  # text.usetex: true # desactivar si no tenes instalado LaTeX
+  pgf.rcfonts: false # desactivar si no tenes instalado LaTeX
+  text.usetex: true # desactivar si no tenes instalado LaTeX
   xtick.bottom: true
   xtick.color: black
   xtick.labelsize: 15
@@ -170,4 +171,7 @@ vector_plot_args:
   headlength: 2
   headwidth: 3
   alpha: 0.9
+  angles: 'xy'
+  scale_units: 'xy'
+  scale: 1 # Aumentar si los vectores se salen de la figura
 ~~~

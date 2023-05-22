@@ -53,7 +53,7 @@ def parabolic_trajectory_multi(x0, y0, v0, angle, g, dt):
 
     return pack_object_multi(R_vector)
 
-def MRU(x0, y0, v0, angle, R, dt, t_max):
+def MRU(x0, y0, v0, angle, dt, t_max):
     
     # Convert angle to radians
     theta = np.radians(angle)
