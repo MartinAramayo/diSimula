@@ -6,6 +6,7 @@ Simulador de trayectorias con vector velocidad y aceleración a partir de las
 coordenadas en función del tiempo $x(t)$ e $y(t)$.
 
 ![](output/olita.gif)
+![](output/parabolic_trajectory_multi.gif)
 
 ## Uso
 
@@ -115,6 +116,48 @@ correr:
 ~~~ bash
 python disimula.py MRU -o output/MRU.mp4
 ~~~
+
+## Ejemplo multipartícula
+
+Para una animación con más de 1 partícula es necesario 
+crear todas las trayectorias y colocarlas en una lista. Esta lista se
+debe retornar en la función de trayectoria usando `pack_object_multi` de la siguiente manera:
+
+~~~ python
+def parabolic_trajectory_multi(x0, y0, v0, angle, g, dt):
+    
+    R_vector = []
+
+    
+    # Calculate time of flight
+    t_max = 2 * v0 * np.sin(45) / g
+
+    # Create time array
+    t = np.arange(0, 2*t_max, dt)
+    
+    for n_object in range(72):
+    
+        # Convert angle to radians
+        theta = np.radians(angle + 5 * n_object)
+
+        # Calculate x and y positions
+        x = x0 + v0 * np.cos(theta) * t
+        y = y0 + v0 * np.sin(theta) * t - 0.5 * g * t**2
+
+        # packaging the array for the plotter
+        r_vector = np.asarray((x, y)).T
+
+        R_vector.append(r_vector)
+
+    return pack_object_multi(R_vector)
+~~~
+
+Todas las particulas deben tener sus `x`, `y` y `t` del mismo tamaño porque en cada cuadro se dibujan todas.
+
+~~~ bash
+python disimula.py parabolic_trajectory_multi -o output/parabolic_trajectory_multi.gif
+~~~
+
 
 ## Requisitos
 
