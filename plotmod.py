@@ -5,8 +5,17 @@ from matplotlib.patches import Patch
 from matplotlib.animation import FuncAnimation
 from matplotlib.colors import LinearSegmentedColormap
 
-def norm(x):
-    return np.linalg.norm(x, axis=1)
+def load_yaml(filename):
+
+    with open(filename, "r") as stream:
+        try:
+            file_dict = yaml.safe_load(stream)
+            return file_dict
+        except yaml.YAMLError as exc:
+            print(exc)
+
+# def norm(x):
+#     return np.linalg.norm(x, axis=1)
 
 def multi_norm(x):
     return np.linalg.norm(x, axis=2)
@@ -31,26 +40,58 @@ def get_vel_acc_multi(R_vector, dt):
 
     return V_vector, A_vector
 
-def skip_step_change(step1, step2):
+def data_bound_box_from_ranges(ax, r_min, r_max, config):
 
-    if step1 < step2:
-        skip = int(step2 / step1)
-        return skip if skip > 1 else 1
+    r_range = r_max - r_min
+
+    # how much space to add to the range
+    spacing = config['spacing']
+    gap = r_range * spacing
+
+    # get the new window range
+    r_a, r_b = r_min - gap, r_max + gap
+    x_a, y_a, x_b, y_b = *r_a, *r_b
+
+    # Scale to data range
+    ax.set_xlim(x_a, x_b)
+    ax.set_ylim(y_a, y_b)
+
+    # Make sure that the plot looks realistic
+    def center(x, y): return (y + x) / 2
+    def radius(x, y): return (y - x) / 2
+
+    center_x = center(x_a, x_b)
+    radius_x = radius(x_a, x_b)
+
+    center_y = center(y_a, y_b)
+    radius_y = radius(y_a, y_b)
+
+    def get_interval(r0, dr): return [r0 - dr, r0 + dr]
+
+    # Scale the shorter axis to the longest
+    X_range, Y_range = r_range
+    is_X_shorther = (X_range < Y_range)
+    if is_X_shorther:
+        ax.set_xlim(*get_interval(center_x, radius_y))
     else:
-        error_str = (
-            "The first step should be" 
-            "smaller than the second"
-        )
-        raise ValueError(error_str)
+        ax.set_ylim(*get_interval(center_y, radius_x))
+    ax.set_aspect('equal')
 
-def load_yaml(filename):
+def data_bound_box(ax, r_vector, config):
 
-    with open(filename, "r") as stream:
-        try:
-            file_dict = yaml.safe_load(stream)
-            return file_dict
-        except yaml.YAMLError as exc:
-            print(exc)
+    # set up plotbox to data, for one body
+    r_max = r_vector.max(axis=0)
+    r_min = r_vector.min(axis=0)
+
+    data_bound_box_from_ranges(ax, r_min, r_max, config)
+
+def data_bound_box_multi(ax, R_vector, config):
+
+    # set up plotbox to data for multiple bodies
+    r_min = R_vector.min(axis=0).min(axis=0)
+    r_max = R_vector.max(axis=0).max(axis=0)
+
+    data_bound_box_from_ranges(ax, r_min, r_max, config)
 
 def colormapL(color):
 
@@ -67,9 +108,9 @@ def set_plot(ax, r_vector, v_vector, a_vector, config):
     point = ax.scatter(*r_0, **config['scatter_args'])
 
     # initial conditions
-    pick = (lambda x, e: x if x > e else e)
-    v0 = pick(norm1d(v_0), config['ERROR'])
-    a0 = pick(norm1d(a_0), config['ERROR'])
+    def pick(x, e): return x if x > e else e
+    v0 = pick(norm1d(v_0), config['norm_cutoff'])
+    a0 = pick(norm1d(a_0), config['norm_cutoff'])
 
     # plot vectors
     plot_args = config['vector_plot_args']
@@ -100,59 +141,6 @@ def set_plot_multi(ax, R_vector, V_vector, A_vector, config):
     
     return Line, Point, Vel, Acc
 
-def data_bound_box(ax, r_vector, config):
-
-    # set up plotbox to data, for one body
-    r_max = r_vector.max(axis=0)
-    r_min = r_vector.min(axis=0)
-
-    data_bound_box_from_ranges(ax, r_min, r_max, config)
-
-def data_bound_box_multi(ax, R_vector, config):
-
-    # set up plotbox to data for multiple bodies
-    r_min = R_vector.min(axis=0).min(axis=0)
-    r_max = R_vector.max(axis=0).max(axis=0)
-
-    data_bound_box_from_ranges(ax, r_min, r_max, config)
-
-def data_bound_box_from_ranges(ax, r_min, r_max, config):
-
-    r_range = r_max - r_min
-
-    # how much space to add to the range
-    spacing = config['spacing']
-    gap = r_range * spacing
-
-    # get the new window range
-    r_a, r_b = r_min - gap, r_max + gap
-    x_a, y_a, x_b, y_b = *r_a, *r_b
-
-    # Scale to data range
-    ax.set_xlim(x_a, x_b)
-    ax.set_ylim(y_a, y_b)
-
-    # Make sure that the plot looks realistic
-    center = (lambda x, y: (y + x) / 2)
-    radius = (lambda x, y: (y - x) / 2)
-
-    center_x = center(x_a, x_b)
-    radius_x = radius(x_a, x_b)
-
-    center_y = center(y_a, y_b)
-    radius_y = radius(y_a, y_b)
-
-    get_interval = (lambda r0, dr: [r0 - dr, r0 + dr])
-
-    # Scale the shorter axis to the longest
-    X_range, Y_range = r_range
-    is_X_shorther = (X_range < Y_range)
-    if is_X_shorther:
-        ax.set_xlim(*get_interval(center_x, radius_y))
-    else:
-        ax.set_ylim(*get_interval(center_y, radius_x))
-    ax.set_aspect('equal')
-
 def add_legend(fig, ax, config):
 
     cm_vel = config['vel_color']
@@ -164,10 +152,22 @@ def add_legend(fig, ax, config):
     ax.set_xlabel(config['x_label'])
     ax.set_ylabel(config['y_label'])
 
-def update_vector(quiv, position, norm, vector, index, ERROR):
+def skip_step_change(step1, step2):
+
+    if step1 < step2:
+        skip = int(step2 / step1)
+        return skip if skip > 1 else 1
+    else:
+        error_str = (
+            "The first step should be" 
+            "smaller than the second"
+        )
+        raise ValueError(error_str)
+
+def update_vector(quiv, position, norm, vector, index, norm_cutoff):
 
     quiv.set_offsets(position)
-    if norm[index] > ERROR:
+    if norm[index] > norm_cutoff:
         quiv.set_UVC(*vector[index], norm[index])
         quiv.set(alpha=0.9)
     else:
@@ -175,7 +175,7 @@ def update_vector(quiv, position, norm, vector, index, ERROR):
 
 # Define the animation function
 def animate_physics(
-    i, line, point, vel, acc, r_vector, skip, ERROR,
+    i, line, point, vel, acc, r_vector, skip, norm_cutoff,
     v_vector, v_norm, a_vector, a_norm
     ):
 
@@ -188,13 +188,13 @@ def animate_physics(
     pos = r_vector[j_1]
     point.set_offsets(pos)
 
-    update_vector(vel, pos, v_norm, v_vector, j_1, ERROR)
-    update_vector(acc, pos, a_norm, a_vector, j_1, ERROR)
+    update_vector(vel, pos, v_norm, v_vector, j_1, norm_cutoff)
+    update_vector(acc, pos, a_norm, a_vector, j_1, norm_cutoff)
 
     return line, vel, acc, 
 
 def animate_physics_multi(
-    i, Line, Point, Vel, Acc, R_vector, skip, ERROR,
+    i, Line, Point, Vel, Acc, R_vector, skip, norm_cutoff,
     V_vector, V_norm, A_vector, A_norm
     ):
 
@@ -216,7 +216,7 @@ def animate_physics_multi(
     
         animate_physics(
             i, line, point, vel, acc, 
-            r_vector, skip, ERROR,
+            r_vector, skip, norm_cutoff,
             v_vector, v_norm, a_vector, a_norm
         )
 

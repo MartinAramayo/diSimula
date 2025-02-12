@@ -3,7 +3,7 @@ spacing: 0.05 # espacio entre la trayectoria y los ejes
 frames: 33.3333 # cuantos FPS la animación gif
 vel_color: "#34BE9D"
 acc_color: "#BE3455"
-ERROR: 0.0000001 # Epsilon de la simulacion (abajo de esto considero todo cero)
+norm_cutoff: 0.0000001 # Epsilon de la simulacion (abajo de esto considero todo cero)
 x_label: 'Coordenada $x$'
 y_label: 'Coordenada $y$'
 # x_label: 'Coordenada x' # Activar si no tenes instalado LaTeX
