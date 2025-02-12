@@ -19,7 +19,6 @@ physics:
     v0: 15.0
     angle: 45.0
     dt: 0.001
-    R: 0.1
     t_max: 4
   olita: 
     x0: 0.0
@@ -47,3 +46,10 @@ physics:
     omega: 1
     dt: 0.001
     t_max: 7
+  parabolic_trajectory_multi_kokoro:
+    x0: 0.0
+    y0: 0.0
+    v0: 8.0
+    angle: 35.0
+    g: 9.81
+    dt: 0.001
