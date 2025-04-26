@@ -17,7 +17,7 @@ style_args:
   font.size: 12
   legend.fontsize: 12
   pgf.rcfonts: false # desactivar si no tenes instalado LaTeX
-  text.usetex: true # desactivar si no tenes instalado LaTeX
+  text.usetex: false # desactivar si no tenes instalado LaTeX
   xtick.bottom: true
   xtick.color: black
   xtick.labelsize: 15
