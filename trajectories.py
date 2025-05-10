@@ -70,6 +70,23 @@ def MRU(x0, y0, v0, angle, dt, t_max):
 
     return pack_object(r_vector)
 
+def MRUV(x0, y0, v0, angle, acc, dt, t_max):
+    
+    # Convert angle to radians
+    theta = np.radians(angle)
+
+    # Create time array
+    t = np.arange(0, t_max, dt)
+
+    # Calculate x and y positions
+    x = x0 + 0.5 * acc * np.cos(theta) * t**2 + v0 * np.cos(theta) * t
+    y = y0 + 0.5 * acc * np.sin(theta) * t**2 + v0 * np.sin(theta) * t
+
+    # packaging the array for the plotter
+    r_vector = np.asarray((x, y)).T
+
+    return pack_object(r_vector)
+
 def MCU_multi(x0, y0, r, omega, dt, t_max):
     
     R_vector = []
